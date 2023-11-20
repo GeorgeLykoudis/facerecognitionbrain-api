@@ -75,21 +75,23 @@ app.post('/register', (req, res) => {
     })
     .catch(err => res.status(400).json('unable to register'));
 
-    // res.json(database.users[database.users.length-1]);
 });
 
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params;
-    let found = false;
-    database.users.forEach(user => {
-        if (user.id === id) {
-            found = true;
-            return res.json(user);
+    db.select('*').from('users').where({id})
+    .then(user => {
+        console.log(user);
+        if (user.length) {
+            res.send(user[0]);
+        } else {
+            res.status(400).send('Not found');
         }
     })
-    if (!found) {
-        return res.status(400).json('No such user!');
-    }
+    .catch(err => res.status(400).send('Error getting user'));
+    // if (!found) {
+    //     return res.status(400).json('No such user!');
+    // }
 });
 
 app.put('/image', (req, res) => {
